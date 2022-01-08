@@ -1,0 +1,5 @@
+.env
+.vscode
+makefile
+out.data
+ab.txt
