@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,8 +23,8 @@ func init() {
 }
 
 const (
-	DB_STAGING = "dfl-campaing"
-	USERS      = "users"
+	DB    = "challenge"
+	USERS = "users"
 )
 
 // User ...
@@ -46,8 +44,7 @@ func main() {
 	r := http.NewServeMux()
 	h := HandlerApp{m: MongoDbClient()}
 
-	r.HandleFunc("/users/create", h.CreaeteUser)
-	r.HandleFunc("/users/all", h.ReadUsers)
+	r.HandleFunc("/all", h.ReadUsers)
 
 	srv := &http.Server{
 		Handler: r,
@@ -57,6 +54,7 @@ func main() {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 	}
+	log.Println("Server running on 0.0.0.0:" + os.Getenv("PORT"))
 	err := srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
@@ -68,30 +66,6 @@ func main() {
 // HandlerApp
 type HandlerApp struct {
 	m *mongo.Client
-}
-
-// CreaeteUser ...
-func (h *HandlerApp) CreaeteUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-
-		reqBody, _ := ioutil.ReadAll(r.Body)
-		var user User
-		json.Unmarshal(reqBody, &user)
-
-		user.ID = primitive.NewObjectID()
-		user.PaymentCard = faker.AmountWithCurrency()
-		user.URL = faker.URL()
-		user.Domain = faker.DomainName()
-
-		err := h.InsertUser(r.Context(), user)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-		err = json.NewEncoder(w).Encode(user)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-	}
 }
 
 // ReadUsers ...
@@ -138,29 +112,11 @@ func MongoDbClient() *mongo.Client {
 	return clientInstance
 }
 
-// InsertUser ...
-func (h *HandlerApp) InsertUser(
-	ctx context.Context,
-	payload User,
-) error {
-	var err error
-
-	//Create a handle to the respective collection in the database.
-	collection := h.m.Database(DB_STAGING).Collection(USERS)
-	//Perform InsertOne operation & validate against the error.
-	_, err = collection.InsertOne(ctx, payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // FetchAllUser ...
 func (h *HandlerApp) FetchAllUser(ctx context.Context) ([]map[string]interface{}, error) {
 	filter := bson.D{{}} //bson.D{{}} specifies 'all documents'
 
-	collection := h.m.Database(DB_STAGING).Collection(USERS)
+	collection := h.m.Database(DB).Collection(USERS)
 	//Perform Find operation & validate against the error.
 	cur, err := collection.Find(ctx, filter)
 	if err != nil {
