@@ -9,7 +9,7 @@ ab:
 docker-mongo-seed:
 	docker exec -i mongo sh -c 'mongoimport -c users -d challenge --drop' < ./dataset/users.json
 
-# Use the dockerfile principal and create an image with ~25mb
+# Use the dockerfile principal and create an image with ~10mb
 docker-build:
 	docker build -t kenriortega/challenge-go:${git_hash} \
 		-f Dockerfile .
