@@ -4,7 +4,7 @@ app:
 	PORT=8080 DATABASE_URL="mongodb://localhost:27017/challenge" go run main.go
 
 ab:
-	ab -n 100 -c 10 -g out.data http://localhost:3000/all > ab.txt
+	ab -n 1000 -c 100 -g out.data <http://localhost:3000/all> > ab.txt
 
 docker-mongo-seed:
 	docker exec -i mongo sh -c 'mongoimport -c users -d challenge --drop' < ./dataset/users.json
