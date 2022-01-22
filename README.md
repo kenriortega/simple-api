@@ -1,6 +1,6 @@
 # SIMPLE API
 
-Simple golang app using std lib net/http package to serve two endpoints REST API
+Simple golang app using std lib net/http package to serve one endpoints REST API
 
 ### Endpoints GetAllUsers
 
