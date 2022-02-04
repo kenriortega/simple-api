@@ -1,6 +1,7 @@
 # SIMPLE API
 
 Simple golang app using std lib net/http package to serve one endpoints REST API
+and mongodb official client
 
 ### Endpoints GetAllUsers
 
@@ -8,11 +9,11 @@ Simple golang app using std lib net/http package to serve one endpoints REST API
 curl localhost:8080/all
 ```
 
-### Bench
+### Bench tool
 
 ```bash
-
-# simple command two use 
-# The values can be change. 
-ab -n 1000 -c 100 -g out.data <http://localhost:3000/all> > ab.txt
+# https://k6.io/docs/ using k6 for benchmarking test
+k6 run k6.js
 ```
+
+### Bech Result
